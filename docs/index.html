@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>プロスピA 自動化ボット - ドキュメント</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #242736;
+      --border: #2e3248;
+      --accent: #5b8dee;
+      --accent2: #e05b7a;
+      --accent3: #5be0a0;
+      --text: #e2e4f0;
+      --text-muted: #7b82a8;
+      --code-bg: #12141e;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', 'Hiragino Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    /* ===== HEADER ===== */
+    header {
+      background: linear-gradient(135deg, #1a1d27 0%, #0f1117 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 48px 24px 40px;
+      text-align: center;
+    }
+    header .badge {
+      display: inline-block;
+      background: var(--accent);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 16px;
+    }
+    header h1 {
+      font-size: clamp(24px, 5vw, 42px);
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 12px;
+    }
+    header h1 span { color: var(--accent); }
+    header p {
+      color: var(--text-muted);
+      font-size: 16px;
+      max-width: 560px;
+      margin: 0 auto;
+    }
+
+    /* ===== NAV ===== */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(15, 17, 23, 0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 0;
+      overflow-x: auto;
+      padding: 0 16px;
+    }
+    nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 14px 16px;
+      white-space: nowrap;
+      border-bottom: 2px solid transparent;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    nav a:hover { color: var(--text); border-color: var(--accent); }
+
+    /* ===== MAIN LAYOUT ===== */
+    main {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 48px 24px;
+    }
+    section { margin-bottom: 64px; }
+    h2 {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 24px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    h2 .icon {
+      width: 32px; height: 32px;
+      background: var(--accent);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--accent);
+      margin: 20px 0 8px;
+    }
+    p { color: var(--text-muted); margin-bottom: 12px; }
+
+    /* ===== OVERVIEW CARDS ===== */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-title .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+    .card p { font-size: 13px; margin: 0; }
+
+    /* ===== FLOW ===== */
+    .flow {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .flow-step {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .flow-left {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .flow-num {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 800;
+      font-size: 14px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .flow-line {
+      width: 2px;
+      flex: 1;
+      min-height: 24px;
+      background: var(--border);
+      margin: 4px 0;
+    }
+    .flow-content {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin-bottom: 8px;
+      flex: 1;
+    }
+    .flow-content .title { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+    .flow-content p { font-size: 13px; margin: 0; }
+
+    /* ===== FILE TABLE ===== */
+    .file-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .file-table th {
+      text-align: left;
+      padding: 10px 14px;
+      background: var(--surface2);
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
+    }
+    .file-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    .file-table tr:last-child td { border-bottom: none; }
+    .file-table tr:hover td { background: var(--surface); }
+    .file-name {
+      font-family: 'Consolas', 'Courier New', monospace;
+      color: var(--accent3);
+      white-space: nowrap;
+    }
+    .file-role { color: var(--text); font-weight: 600; }
+    .file-desc { color: var(--text-muted); }
+
+    /* ===== CODE ===== */
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px 20px;
+      overflow-x: auto;
+      font-size: 13px;
+      line-height: 1.6;
+      margin: 12px 0;
+    }
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      color: var(--accent3);
+    }
+    pre code { color: var(--text); }
+    .hl-comment { color: #6272a4; }
+    .hl-keyword { color: #ff79c6; }
+    .hl-string { color: #f1fa8c; }
+    .hl-func { color: #50fa7b; }
+    .hl-num { color: #bd93f9; }
+
+    /* ===== TEMPLATE LIST ===== */
+    .template-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .template-tag {
+      font-family: 'Consolas', monospace;
+      font-size: 12px;
+      padding: 5px 12px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--accent3);
+    }
+
+    /* ===== ARCH DIAGRAM ===== */
+    .arch {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px;
+      text-align: center;
+    }
+    .arch-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 8px 0;
+    }
+    .arch-box {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: 'Consolas', monospace;
+    }
+    .arch-box.main { border-color: var(--accent); color: var(--accent); }
+    .arch-box.sub { border-color: var(--accent3); color: var(--accent3); }
+    .arch-box.ext { border-color: var(--accent2); color: var(--accent2); }
+    .arch-arrow {
+      color: var(--text-muted);
+      font-size: 20px;
+      line-height: 1;
+    }
+    .arch-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin: 4px 0;
+    }
+
+    /* ===== ALERT ===== */
+    .alert {
+      background: rgba(91, 141, 238, 0.1);
+      border: 1px solid rgba(91, 141, 238, 0.3);
+      border-radius: 10px;
+      padding: 14px 18px;
+      font-size: 13px;
+      margin: 12px 0;
+    }
+    .alert.warn {
+      background: rgba(224, 91, 122, 0.1);
+      border-color: rgba(224, 91, 122, 0.3);
+    }
+
+    /* ===== MODE COLUMNS ===== */
+    .mode-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 600px) {
+      .mode-grid { grid-template-columns: 1fr; }
+    }
+    .mode-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .mode-card h3 { margin-top: 0; }
+    .mode-card ul {
+      list-style: none;
+      padding: 0;
+    }
+    .mode-card li {
+      font-size: 13px;
+      color: var(--text-muted);
+      padding: 5px 0;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .mode-card li:last-child { border-bottom: none; }
+    .mode-card li::before {
+      content: '→';
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    /* ===== FOOTER ===== */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 24px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header>
+  <div class="badge">Python + ADB + OpenCV</div>
+  <h1>プロスピA <span>自動化ボット</span></h1>
+  <p>ADB を使ってAndroidデバイスを操作し、プロ野球スピリッツAのゲームを自動で周回するシステム</p>
+</header>
+
+<!-- ===== NAV ===== -->
+<nav>
+  <a href="#overview">概要</a>
+  <a href="#architecture">アーキテクチャ</a>
+  <a href="#files">ファイル構成</a>
+  <a href="#modes">動作モード</a>
+  <a href="#templates">テンプレート</a>
+  <a href="#setup">セットアップ</a>
+  <a href="#flow">処理フロー</a>
+</nav>
+
+<main>
+
+  <!-- ===== OVERVIEW ===== -->
+  <section id="overview">
+    <h2><span class="icon">📋</span>システム概要</h2>
+    <p>このシステムはPC上のPythonスクリプトが <strong>ADB (Android Debug Bridge)</strong> 経由でスマートフォンを遠隔操作し、プロスピAのゲーム画面をスクリーンショット→画像認識→タップ という流れで自動周回するボットです。</p>
+
+    <div class="cards">
+      <div class="card">
+        <div class="card-title"><span class="dot" style="background:var(--accent)"></span>対象ゲーム</div>
+        <p>プロ野球スピリッツA（Android版）。試練モードとVロードモードの2種類を自動化。</p>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot" style="background:var(--accent3)"></span>動作原理</div>
+        <p>ADBでスクショを取得 → OpenCVでUI部品を画像認識 → ADBでタップ送信。この繰り返し。</p>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot" style="background:var(--accent2)"></span>接続方式</div>
+        <p>USBケーブル接続またはWi-Fi（ワイヤレスデバッグ）の両方に対応。</p>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot" style="background:#f1b429"></span>主な自動処理</div>
+        <p>難易度選択・試合開始・結果スキップ・スタミナ回復・ラウンド結果処理など。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== ARCHITECTURE ===== -->
+  <section id="architecture">
+    <h2><span class="icon">🏗</span>アーキテクチャ</h2>
+
+    <div class="arch">
+      <div class="arch-label">ユーザー</div>
+      <div class="arch-row">
+        <div class="arch-box main">bot.py</div>
+      </div>
+      <div class="arch-row">
+        <div class="arch-arrow">↓</div>
+      </div>
+      <div class="arch-row">
+        <div class="arch-box sub">screen.py</div>
+        <div class="arch-box sub">adb_controller.py</div>
+        <div class="arch-box sub">config.py</div>
+      </div>
+      <div class="arch-row">
+        <div class="arch-arrow">↓</div>
+        <div class="arch-arrow" style="opacity:0">↓</div>
+        <div class="arch-arrow" style="opacity:0">↓</div>
+      </div>
+      <div class="arch-row">
+        <div class="arch-box ext">OpenCV</div>
+        <div class="arch-box ext">ADB.exe</div>
+        <div class="arch-box ext">templates/*.png</div>
+      </div>
+      <div class="arch-row">
+        <div class="arch-arrow">↓</div>
+      </div>
+      <div class="arch-label">Androidデバイス（プロスピA）</div>
+    </div>
+
+    <div class="alert" style="margin-top:16px">
+      <strong>データの流れ：</strong>
+      bot.py が処理判断の中枢。screen.py が「見る」、adb_controller.py が「操作する」役割を持ち、config.py が全体の設定を保持する。
+    </div>
+  </section>
+
+  <!-- ===== FILES ===== -->
+  <section id="files">
+    <h2><span class="icon">📁</span>ファイル構成</h2>
+
+    <table class="file-table">
+      <thead>
+        <tr>
+          <th>ファイル</th>
+          <th>役割</th>
+          <th>説明</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="file-name">bot.py</td>
+          <td class="file-role">メインボット</td>
+          <td class="file-desc">試練・Vロードの自動化ループ。各フェーズの処理を統括する</td>
+        </tr>
+        <tr>
+          <td class="file-name">adb_controller.py</td>
+          <td class="file-role">ADB操作ラッパー</td>
+          <td class="file-desc">ADBコマンドの実行をラップ。スクショ取得・タップ・スワイプ・キーイベント・接続確認</td>
+        </tr>
+        <tr>
+          <td class="file-name">screen.py</td>
+          <td class="file-role">画像認識エンジン</td>
+          <td class="file-desc">OpenCVでテンプレートマッチング。画面検索・待機・タップを一括提供</td>
+        </tr>
+        <tr>
+          <td class="file-name">config.py</td>
+          <td class="file-role">設定ファイル</td>
+          <td class="file-desc">ADBパス・デバイスシリアル・解像度・タイミング・マッチング閾値などの定数</td>
+        </tr>
+        <tr>
+          <td class="file-name">capture_tool.py</td>
+          <td class="file-role">テンプレート登録GUI</td>
+          <td class="file-desc">OpenCVウィンドウでスクショを表示し、マウスドラッグで切り出してテンプレート保存</td>
+        </tr>
+        <tr>
+          <td class="file-name">check_device.py</td>
+          <td class="file-role">接続確認スクリプト</td>
+          <td class="file-desc">ADB接続・画面サイズ取得・スクショ取得のテスト用ユーティリティ</td>
+        </tr>
+        <tr>
+          <td class="file-name">setup.bat</td>
+          <td class="file-role">環境構築</td>
+          <td class="file-desc">pip で opencv-python / pillow / numpy をインストールするワンクリックセットアップ</td>
+        </tr>
+        <tr>
+          <td class="file-name">templates/</td>
+          <td class="file-role">テンプレート画像</td>
+          <td class="file-desc">ボタンや画面を識別するための切り出し画像（.png）を格納するフォルダ</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ===== MODES ===== -->
+  <section id="modes">
+    <h2><span class="icon">🎮</span>動作モード</h2>
+    <p>起動時に1または2を入力してモードを選択。どちらも <code>Ctrl+C</code> で停止するまで無限ループ。</p>
+
+    <div class="mode-grid">
+      <div class="mode-card">
+        <h3>① 試練モード</h3>
+        <p style="font-size:13px">初級→中級→上級 を順番にローテーションして自動周回する。</p>
+        <ul>
+          <li>難易度ボタン選択（初級/中級/上級）</li>
+          <li>「自動試合開始」をタップ</li>
+          <li>試合終了後の結果画面スキップ</li>
+          <li>スタミナ不足時に80回復</li>
+          <li>難易度選択画面に戻るまで待機</li>
+        </ul>
+      </div>
+      <div class="mode-card">
+        <h3>② Vロードモード</h3>
+        <p style="font-size:13px">Vロード専用の結果画面・ラウンド結果を処理しながら周回。</p>
+        <ul>
+          <li>「自動試合開始」をタップ</li>
+          <li>ラウンド結果画面を3回タップで消去</li>
+          <li>「次の試合へ」ボタンを検出してタップ</li>
+          <li>Vロード専用「次へ」ボタンを処理</li>
+          <li>5秒間無反応時にアイドルタップ</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="alert warn" style="margin-top:16px">
+      Vロードモードは <code>btn_next_match</code>・<code>btn_next_vroad</code>・<code>screen_round_result</code> の3つのテンプレートが必須。未登録の場合は起動時にエラーメッセージで停止する。
+    </div>
+  </section>
+
+  <!-- ===== TEMPLATES ===== -->
+  <section id="templates">
+    <h2><span class="icon">🖼</span>テンプレート画像一覧</h2>
+    <p>画像認識に使用するテンプレートは <code>templates/</code> フォルダに格納。<code>capture_tool.py</code> で追加・更新できる。</p>
+
+    <div class="template-grid">
+      <span class="template-tag">btn_auto_start.png</span>
+      <span class="template-tag">btn_shokyu.png</span>
+      <span class="template-tag">btn_chukyu.png</span>
+      <span class="template-tag">btn_jokyu.png</span>
+      <span class="template-tag">btn_next.png</span>
+      <span class="template-tag">btn_next_match.png</span>
+      <span class="template-tag">btn_next_vroad.png</span>
+      <span class="template-tag">btn_ok.png</span>
+      <span class="template-tag">btn_recover_80.png</span>
+      <span class="template-tag">screen_round_result.png</span>
+      <span class="template-tag">screen_tap.png</span>
+    </div>
+
+    <h3>マッチングアルゴリズム</h3>
+    <p>OpenCVの <code>cv2.TM_CCOEFF_NORMED</code> を使用。グレースケール変換後に正規化相互相関でスコアを算出し、閾値（デフォルト <strong>0.80</strong>）以上なら一致と判定する。</p>
+
+    <pre><code><span class="hl-comment"># screen.py より抜粋</span>
+screen_gray = cv2.cvtColor(screen_img, cv2.COLOR_BGR2GRAY)
+template_gray = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
+result = cv2.matchTemplate(screen_gray, template_gray, cv2.TM_CCOEFF_NORMED)
+_, max_val, _, max_loc = cv2.minMaxLoc(result)
+<span class="hl-keyword">if</span> max_val >= threshold:
+    center_x = max_loc[<span class="hl-num">0</span>] + w // <span class="hl-num">2</span>
+    center_y = max_loc[<span class="hl-num">1</span>] + h // <span class="hl-num">2</span>
+    <span class="hl-keyword">return</span> (center_x, center_y)</code></pre>
+  </section>
+
+  <!-- ===== SETUP ===== -->
+  <section id="setup">
+    <h2><span class="icon">⚙️</span>セットアップ</h2>
+
+    <h3>1. 依存ライブラリのインストール</h3>
+    <pre><code>setup.bat  <span class="hl-comment"># ダブルクリックで実行</span>
+<span class="hl-comment"># または</span>
+pip install opencv-python pillow numpy</code></pre>
+
+    <h3>2. config.py の設定</h3>
+    <pre><code>ADB_PATH = <span class="hl-string">r"C:\...\adb.exe"</span>      <span class="hl-comment"># ADBの場所を指定</span>
+DEVICE_SERIAL = <span class="hl-keyword">None</span>               <span class="hl-comment"># 1台接続ならNoneでOK</span>
+SCREEN_WIDTH = <span class="hl-num">1080</span>                <span class="hl-comment"># デバイスの解像度</span>
+SCREEN_HEIGHT = <span class="hl-num">2400</span></code></pre>
+
+    <h3>3. デバイス接続確認</h3>
+    <pre><code>python check_device.py</code></pre>
+
+    <h3>4. テンプレート画像の登録</h3>
+    <pre><code>python capture_tool.py
+<span class="hl-comment"># スクショが表示されるのでドラッグで範囲選択 → S で保存</span></code></pre>
+
+    <h3>5. ボット起動</h3>
+    <pre><code>python bot.py
+<span class="hl-comment"># 1: 試練  2: Vロード  を選択</span></code></pre>
+
+    <div class="alert">
+      <strong>Wi-Fi接続の場合：</strong> スマホの「ワイヤレスデバッグ」を有効にして <code>adb connect &lt;IP&gt;:5555</code> を実行後、config.py の DEVICE_SERIAL にIPアドレスを設定する。
+    </div>
+  </section>
+
+  <!-- ===== FLOW ===== -->
+  <section id="flow">
+    <h2><span class="icon">🔄</span>処理フロー詳細</h2>
+
+    <h3>試練モード</h3>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-left"><div class="flow-num">1</div><div class="flow-line"></div></div>
+        <div class="flow-content"><div class="title">難易度ボタン選択</div><p>初級→中級→上級 を順番にローテーション。ボタンが見つからなければ手動入力待ち</p></div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-left"><div class="flow-num">2</div><div class="flow-line"></div></div>
+        <div class="flow-content"><div class="title">自動試合開始</div><p>btn_auto_start を最大15秒待機してタップ</p></div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-left"><div class="flow-num">3</div><div class="flow-line"></div></div>
+        <div class="flow-content"><div class="title">試合終了〜結果処理（最大5分）</div><p>スタミナ不足検出→回復、TAP SCREEN→タップ、次へボタン→タップ を繰り返す</p></div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-left"><div class="flow-num">4</div></div>
+        <div class="flow-content"><div class="title">難易度選択画面に戻ったら1へ戻る</div><p>いずれかの難易度ボタンが検出されれば1周完了</p></div>
+      </div>
+    </div>
+
+    <h3>Vロードモード</h3>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-left"><div class="flow-num">1</div><div class="flow-line"></div></div>
+        <div class="flow-content"><div class="title">自動試合開始</div><p>btn_auto_start をタップ</p></div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-left"><div class="flow-num">2</div><div class="flow-line"></div></div>
+        <div class="flow-content"><div class="title">試合中〜ラウンド結果処理（最大5分）</div><p>ラウンド結果画面では1秒間隔で3回タップ。次の試合へ / Vロード次へ / 通常次へ を優先順位付きで検出</p></div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-left"><div class="flow-num">3</div><div class="flow-line"></div></div>
+        <div class="flow-content"><div class="title">アイドルタップ機構</div><p>5秒間何も検出されない場合、画面上部（300px）を安全タップしてUIをリセット</p></div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-left"><div class="flow-num">4</div></div>
+        <div class="flow-content"><div class="title">btn_auto_start が戻ってきたら1へ</div><p>自動試合開始画面を検出したら1周完了</p></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  プロスピA 自動化ボット ドキュメント &nbsp;|&nbsp; Python / ADB / OpenCV &nbsp;|&nbsp; 対象デバイス: Pixel 8a (1080×2400)
+</footer>
+
+</body>
+</html>

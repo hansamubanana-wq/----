@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(where adb:*)",
+      "Read(//c/Users/Soichi/**)",
+      "Bash(python --version 2>/dev/null; pip list 2>/dev/null | grep -iE \"opencv|PIL|pillow|numpy\")",
+      "Bash(pip list:*)",
+      "Bash(python -c \"\ncontent = '@echo off\\\\r\\\\necho setup start...\\\\r\\\\npy -m pip install opencv-python pillow numpy\\\\r\\\\necho.\\\\r\\\\necho Done!\\\\r\\\\npause\\\\r\\\\n'\nwith open\\('C:/Users/Soichi/OneDrive/Desktop/\\\\u30d7\\\\u30ed\\\\u30b9\\\\u30d4/setup.bat', 'w', encoding='cp932'\\) as f:\n    f.write\\(content\\)\nprint\\('OK'\\)\n\")",
+      "Bash(py -c \"\ncontent = '@echo off\\\\r\\\\necho setup start...\\\\r\\\\npy -m pip install opencv-python pillow numpy\\\\r\\\\necho.\\\\r\\\\necho Done!\\\\r\\\\npause\\\\r\\\\n'\nwith open\\(r'C:\\\\Users\\\\Soichi\\\\OneDrive\\\\Desktop\\\\プロスピ\\\\setup.bat', 'w', encoding='cp932'\\) as f:\n    f.write\\(content\\)\nprint\\('OK'\\)\n\")"
+    ]
+  }
+}
